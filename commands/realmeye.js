@@ -63,9 +63,7 @@ module.exports.run = async (bot, message, args) => {
                     var lastSeen = body.last_seen;
 
                     var rankImage;
-
-                    //if ()
-
+                    
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + " **RotMG Player Card - " + name + "**")
                         .setColor(0xDA3118)

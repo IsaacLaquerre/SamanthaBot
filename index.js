@@ -10,6 +10,7 @@ var eyeEmote = "<:rotmgeye:680089603277062149>";
 
 bot.on("ready", () => {
     clear({ toStart: true });
+    bot.user.setActivity("rotmg", { type: "PLAYING" });
     console.log("\n--------------------\n|Samantha Bot ready|\n--------------------");
 });
 

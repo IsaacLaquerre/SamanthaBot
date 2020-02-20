@@ -44,6 +44,15 @@ function padlock(ability) {
     else return "🔓";
 }
 
+function rank2Star(rank) {
+    if (rank < 15) return "<:lightbluestar:680133817960628284>";
+    else if (rank >= 15 && rank < 30) return "<:bluestar:680133825300660251>";
+    else if (rank >= 30 && rank < 45) return "<:redstar:680133931659821057>";
+    else if (rank >= 45 && rank < 60) return "<:orangestar:680133939415089206>";
+    else if (rank >= 60 && rank < 75) return "<:yellowstar:680133953340047435>";
+    else if (rank === 75) return "<:whitestar:680133960793325568>";
+}
+
 module.exports.run = async (bot, message, args) => {
     switch(args[1].toLowerCase()) {
         case "user":
@@ -64,13 +73,11 @@ module.exports.run = async (bot, message, args) => {
 
                     var rankImage;
 
-                    //if ()
-
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + " **RotMG Player Card - " + name + "**")
                         .setColor(0xDA3118)
                         //.setThumbnail
-                        .addField("Rank:", rank, true)
+                        .addField("Rank:", rank2Star(rank) + " " + rank, true)
                         .addField("Exp:", numberWithSpaces(xp), true)
                         .addBlankField(true)
                         .addField("Fame:", numberWithSpaces(fame), true)

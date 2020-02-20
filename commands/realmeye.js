@@ -92,6 +92,7 @@ module.exports.run = async (bot, message, args) => {
         break;
         case "character":
         case "char":
+        case "c":
             if (!args[2]) return message.channel.send(":x: **No username given**");
             else {
                 fetch("http://www.tiffit.net/RealmInfo/api/user?u=" + args[2].toLowerCase()).then(res => res.json()).then(body => {
@@ -241,154 +242,156 @@ module.exports.run = async (bot, message, args) => {
                 });
             }
         break;
-        case "pets":if (!args[2]) return message.channel.send(":x: **No username given**");
-        else {
-            fetch("http://www.tiffit.net/RealmInfo/api/pets-of?u=" + args[2].toLowerCase()).then(res => res.json()).then(body => {
-                if (body.error) return message.channel.send(":x: **No user matched the query \"" + args[2] + "\"** " + eyeEmote);
+        case "pets":
+        case "p":
+            if (!args[2]) return message.channel.send(":x: **No username given**");
+            else {
+                fetch("http://www.tiffit.net/RealmInfo/api/pets-of?u=" + args[2].toLowerCase()).then(res => res.json()).then(body => {
+                    if (body.error) return message.channel.send(":x: **No user matched the query \"" + args[2] + "\"** " + eyeEmote);
 
-                var name = args[2];
-                var petCount = body.number_of_pets;
-                var pets = body.pets;
+                    var name = args[2];
+                    var petCount = body.number_of_pets;
+                    var pets = body.pets;
 
-                if (pets.length <= 0) return message.channel.send(":x: **This user has no pets**");
+                    if (pets.length <= 0) return message.channel.send(":x: **This user has no pets**");
 
-                if (args[3]) {
-                    if (args[3] < petCount && !isNaN(args[3])) {
-                        var index = args[3];
-                        index--;
-                    }
-                    else var index = 0;
-                }else var index = 0;
+                    if (args[3]) {
+                        if (args[3] < petCount && !isNaN(args[3])) {
+                            var index = args[3];
+                            index--;
+                        }
+                        else var index = 0;
+                    }else var index = 0;
 
-                var embed = new Discord.RichEmbed()
-                    .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
-                    .setColor(0xDA3118)
-                    //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
-                    .addField("Name: ", body.pets[index].name, true)
-                    .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
-                    .addBlankField(true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("⠀", "ABILITY 1", true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("Type: ", body.pets[index].ability1.type, true)
-                    .addField("Level: ", ability2Level(body.pets[index].ability1), true)
-                    .addField("⠀", padlock(body.pets[index].ability1), true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("⠀", "ABILITY 2", true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("Type: ", body.pets[index].ability2.type, true)
-                    .addField("Level: ", ability2Level(body.pets[index].ability2), true)
-                    .addField("⠀", padlock(body.pets[index].ability2), true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("⠀", "ABILITY 3", true)
-                    .addField("⠀", "-----   -----", true)
-                    .addField("Type: ", body.pets[index].ability3.type, true)
-                    .addField("Level: ", ability2Level(body.pets[index].ability3), true)
-                    .addField("⠀", padlock(body.pets[index].ability3), true)
-                    .addBlankField(true)
-                    .setFooter("Page " + (index + 1) + "/" + petCount);
-                message.channel.send(embed).then(messageEmbed => {
-                    messageEmbed.react("◀").then(() => {
-                        messageEmbed.react("❌").then(() => {
-                            messageEmbed.react("▶").then(() => {
-                                var lArrowFilter = (reaction, user) => reaction.emoji.name === "◀" && user.id != bot.user.id;
-                                var xFilter = (reaction, user) => reaction.emoji.name === "❌" && user.id != bot.user.id;
-                                var rArrowFilter = (reaction, user) => reaction.emoji.name === "▶" && user.id != bot.user.id;
-                                var left = messageEmbed.createReactionCollector(lArrowFilter);
-                                var x = messageEmbed.createReactionCollector(xFilter);
-                                var right = messageEmbed.createReactionCollector(rArrowFilter);
+                    var embed = new Discord.RichEmbed()
+                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                        .setColor(0xDA3118)
+                        //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
+                        .addField("Name: ", body.pets[index].name, true)
+                        .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
+                        .addBlankField(true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("⠀", "ABILITY 1", true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("Type: ", body.pets[index].ability1.type, true)
+                        .addField("Level: ", ability2Level(body.pets[index].ability1), true)
+                        .addField("⠀", padlock(body.pets[index].ability1), true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("⠀", "ABILITY 2", true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("Type: ", body.pets[index].ability2.type, true)
+                        .addField("Level: ", ability2Level(body.pets[index].ability2), true)
+                        .addField("⠀", padlock(body.pets[index].ability2), true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("⠀", "ABILITY 3", true)
+                        .addField("⠀", "-----   -----", true)
+                        .addField("Type: ", body.pets[index].ability3.type, true)
+                        .addField("Level: ", ability2Level(body.pets[index].ability3), true)
+                        .addField("⠀", padlock(body.pets[index].ability3), true)
+                        .addBlankField(true)
+                        .setFooter("Page " + (index + 1) + "/" + petCount);
+                    message.channel.send(embed).then(messageEmbed => {
+                        messageEmbed.react("◀").then(() => {
+                            messageEmbed.react("❌").then(() => {
+                                messageEmbed.react("▶").then(() => {
+                                    var lArrowFilter = (reaction, user) => reaction.emoji.name === "◀" && user.id != bot.user.id;
+                                    var xFilter = (reaction, user) => reaction.emoji.name === "❌" && user.id != bot.user.id;
+                                    var rArrowFilter = (reaction, user) => reaction.emoji.name === "▶" && user.id != bot.user.id;
+                                    var left = messageEmbed.createReactionCollector(lArrowFilter);
+                                    var x = messageEmbed.createReactionCollector(xFilter);
+                                    var right = messageEmbed.createReactionCollector(rArrowFilter);
 
-                                left.on("collect", () => {
-                                    messageEmbed.clearReactions().then(() => {
-                                        messageEmbed.react("◀").then(() => {
-                                            messageEmbed.react("❌").then(() => {
-                                                messageEmbed.react("▶");
+                                    left.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.react("◀").then(() => {
+                                                messageEmbed.react("❌").then(() => {
+                                                    messageEmbed.react("▶");
+                                                });
+                                            });
+                                        });
+                                        if (index === 0) index = (petCount - 1);
+                                        else index--;
+                                        var Lembed = new Discord.RichEmbed()
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                                            .setColor(0xDA3118)
+                                            //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
+                                            .addField("Name: ", body.pets[index].name, true)
+                                            .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
+                                            .addBlankField(true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 1", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability1.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability1), true)
+                                            .addField("⠀", padlock(body.pets[index].ability1), true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 2", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability2.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability2), true)
+                                            .addField("⠀", padlock(body.pets[index].ability2), true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 3", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability3.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability3), true)
+                                            .addField("⠀", padlock(body.pets[index].ability3), true)
+                                            .addBlankField(true)
+                                            .setFooter("Page " + (index + 1) + "/" + petCount);
+                                        messageEmbed.edit(Lembed);
+                                    });
+                                    x.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.delete().then(() => {
+                                                message.delete();
                                             });
                                         });
                                     });
-                                    if (index === 0) index = (petCount - 1);
-                                    else index--;
-                                    var Lembed = new Discord.RichEmbed()
-                                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
-                                        .setColor(0xDA3118)
-                                        //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
-                                        .addField("Name: ", body.pets[index].name, true)
-                                        .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
-                                        .addBlankField(true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 1", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability1.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability1), true)
-                                        .addField("⠀", padlock(body.pets[index].ability1), true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 2", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability2.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability2), true)
-                                        .addField("⠀", padlock(body.pets[index].ability2), true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 3", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability3.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability3), true)
-                                        .addField("⠀", padlock(body.pets[index].ability3), true)
-                                        .addBlankField(true)
-                                        .setFooter("Page " + (index + 1) + "/" + petCount);
-                                    messageEmbed.edit(Lembed);
-                                });
-                                x.on("collect", () => {
-                                    messageEmbed.clearReactions().then(() => {
-                                        messageEmbed.delete().then(() => {
-                                            message.delete();
-                                        });
-                                    });
-                                });
-                                right.on("collect", () => {
-                                    messageEmbed.clearReactions().then(() => {
-                                        messageEmbed.react("◀").then(() => {
-                                            messageEmbed.react("❌").then(() => {
-                                                messageEmbed.react("▶");
+                                    right.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.react("◀").then(() => {
+                                                messageEmbed.react("❌").then(() => {
+                                                    messageEmbed.react("▶");
+                                                });
                                             });
                                         });
+                                        if (index === (petCount - 1)) index = 0;
+                                        else index++;
+                                        var Rembed = new Discord.RichEmbed()
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                                            .setColor(0xDA3118)
+                                            //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
+                                            .addField("Name: ", body.pets[index].name, true)
+                                            .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
+                                            .addBlankField(true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 1", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability1.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability1), true)
+                                            .addField("⠀", padlock(body.pets[index].ability1), true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 2", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability2.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability2), true)
+                                            .addField("⠀", padlock(body.pets[index].ability2), true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("⠀", "ABILITY 3", true)
+                                            .addField("⠀", "-----   -----", true)
+                                            .addField("Type: ", body.pets[index].ability3.type, true)
+                                            .addField("Level: ", ability2Level(body.pets[index].ability3), true)
+                                            .addField("⠀", padlock(body.pets[index].ability3), true)
+                                            .addBlankField(true)
+                                            .setFooter("Page " + (index + 1) + "/" + petCount);
+                                        messageEmbed.edit(Rembed);
                                     });
-                                    if (index === (petCount - 1)) index = 0;
-                                    else index++;
-                                    var Rembed = new Discord.RichEmbed()
-                                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
-                                        .setColor(0xDA3118)
-                                        //.setThumbnail(getCharImage(pets[index].class.toLowerCase()))
-                                        .addField("Name: ", body.pets[index].name, true)
-                                        .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
-                                        .addBlankField(true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 1", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability1.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability1), true)
-                                        .addField("⠀", padlock(body.pets[index].ability1), true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 2", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability2.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability2), true)
-                                        .addField("⠀", padlock(body.pets[index].ability2), true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("⠀", "ABILITY 3", true)
-                                        .addField("⠀", "-----   -----", true)
-                                        .addField("Type: ", body.pets[index].ability3.type, true)
-                                        .addField("Level: ", ability2Level(body.pets[index].ability3), true)
-                                        .addField("⠀", padlock(body.pets[index].ability3), true)
-                                        .addBlankField(true)
-                                        .setFooter("Page " + (index + 1) + "/" + petCount);
-                                    messageEmbed.edit(Rembed);
                                 });
                             });
                         });
                     });
                 });
-            });
-        }
+            }
         break;
     }
 };

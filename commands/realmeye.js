@@ -71,12 +71,9 @@ module.exports.run = async (bot, message, args) => {
                     var created = body.created;
                     var lastSeen = body.last_seen;
 
-                    var rankImage;
-
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + " **RotMG Player Card - " + name + "**")
                         .setColor(0xDA3118)
-                        //.setThumbnail
                         .addField("Rank:", rank2Star(rank) + " " + rank, true)
                         .addField("Exp:", numberWithSpaces(xp), true)
                         .addBlankField(true)

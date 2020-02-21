@@ -1,5 +1,5 @@
 # SamanthaBot
-If you intend to clone this repo and host this bot yourself, please change the following configurations in the [config file](https://github.com/IsaacLaquerre/SamanthaBot/tree/master/config)
+If you intend to clone this repo and host this bot yourself, please change the following configurations in the [config file](/config)
 
 ```json
 {

@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
+const graveScrape = require("graveyard-scrape").scrapeGraveyard;
 const config = require("../config/botConfig.json");
 
 var PREFIX = config.prefix;
@@ -90,7 +91,7 @@ module.exports.run = async (bot, message, args) => {
                 });
             }
         break;
-        case "character":
+        case "characters":
         case "char":
         case "c":
             if (!args[2]) return message.channel.send(":x: **No username given**");
@@ -104,7 +105,13 @@ module.exports.run = async (bot, message, args) => {
 
                     if (characters.length <= 0) return message.channel.send(":x: **This user has no characters**");
 
-                    var index = 0;
+                    if (args[3]) {
+                        if (args[3] < characterCount && !isNaN(args[3])) {
+                            var index = args[3];
+                            index--;
+                        }
+                        else var index = 0;
+                    }else var index = 0;
 
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
@@ -264,7 +271,7 @@ module.exports.run = async (bot, message, args) => {
                     }else var index = 0;
 
                     var embed = new Discord.RichEmbed()
-                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                         .setColor(0xDA3118)
                         .addField("Name: ", body.pets[index].name, true)
                         .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
@@ -311,7 +318,7 @@ module.exports.run = async (bot, message, args) => {
                                         if (index === 0) index = (petCount - 1);
                                         else index--;
                                         var Lembed = new Discord.RichEmbed()
-                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                                             .setColor(0xDA3118)
                                             .addField("Name: ", body.pets[index].name, true)
                                             .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
@@ -356,7 +363,7 @@ module.exports.run = async (bot, message, args) => {
                                         if (index === (petCount - 1)) index = 0;
                                         else index++;
                                         var Rembed = new Discord.RichEmbed()
-                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                                             .setColor(0xDA3118)
                                             .addField("Name: ", body.pets[index].name, true)
                                             .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
@@ -390,11 +397,145 @@ module.exports.run = async (bot, message, args) => {
                 });
             }
         break;
+        case "graveyard":
+        case "gy":
+            if (!args[2]) return message.channel.send(":x: **No username given**");
+            else {
+                graveScrape(args[2].toLowerCase(), 5).then(graveYard => {
+
+                    if (args[3]) {
+                        if (args[3] < graveYard.length && !isNaN(args[3])) {
+                            var index = args[3];
+                            index--;
+                        }
+                        else var index = 0;
+                    }else var index = 0;
+
+                    var date = graveYard[index].death_date;
+                    var className = graveYard[index].class;
+                    var level = graveYard[index].level;
+                    var fame = graveYard[index].total_fame;
+                    var xp = graveYard[index].experience;
+                    var stats = graveYard[index].death_stats;
+                    var killedBy = graveYard[index].killed_by;
+                    var name = args[2];
+
+                    var embed = new Discord.RichEmbed()
+                        .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
+                        .setColor(0xDA3118)
+                        .setThumbnail(getCharImage(className))
+                        .addField("Class:", className + " (level " + level + ") - " + stats, true)
+                        .addBlankField(true)
+                        .addBlankField(true)
+                        .addField("Fame:", numberWithSpaces(fame), true)
+                        .addField("Exp:", numberWithSpaces(xp), true)
+                        .addBlankField(true)
+                        .addField("Killed by:", killedBy, true)
+                        .addField("On:", date, true)
+                        .addBlankField(true)
+                        .setFooter("Page " + (index + 1) + "/" + graveYard.length);
+                    message.channel.send(embed).then(messageEmbed => {
+                        messageEmbed.react("◀").then(() => {
+                            messageEmbed.react("❌").then(() => {
+                                messageEmbed.react("▶").then(() => {
+                                    var lArrowFilter = (reaction, user) => reaction.emoji.name === "◀" && user.id != bot.user.id;
+                                    var xFilter = (reaction, user) => reaction.emoji.name === "❌" && user.id != bot.user.id;
+                                    var rArrowFilter = (reaction, user) => reaction.emoji.name === "▶" && user.id != bot.user.id;
+                                    var left = messageEmbed.createReactionCollector(lArrowFilter);
+                                    var x = messageEmbed.createReactionCollector(xFilter);
+                                    var right = messageEmbed.createReactionCollector(rArrowFilter);
+
+                                    left.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.react("◀").then(() => {
+                                                messageEmbed.react("❌").then(() => {
+                                                    messageEmbed.react("▶");
+                                                });
+                                            });
+                                        });
+                                        if (index === 0) index = (graveYard.length - 1);
+                                        else index--;
+
+                                        var date = graveYard[index].death_date;
+                                        var className = graveYard[index].class;
+                                        var level = graveYard[index].level;
+                                        var fame = graveYard[index].total_fame;
+                                        var xp = graveYard[index].experience;
+                                        var stats = graveYard[index].death_stats;
+                                        var killedBy = graveYard[index].killed_by;
+
+                                        var Lembed = new Discord.RichEmbed()
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
+                                            .setColor(0xDA3118)
+                                            .setThumbnail(getCharImage(className))
+                                            .addField("Class:", className + " (level " + level + ") - " + stats, true)
+                                            .addBlankField(true)
+                                            .addBlankField(true)
+                                            .addField("Fame:", numberWithSpaces(fame), true)
+                                            .addField("Exp:", numberWithSpaces(xp), true)
+                                            .addBlankField(true)
+                                            .addField("Killed by:", killedBy, true)
+                                            .addField("On:", date, true)
+                                            .addBlankField(true)
+                                            .setFooter("Page " + (index + 1) + "/" + graveYard.length);
+                                        messageEmbed.edit(Lembed);
+                                    });
+                                    x.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.delete().then(() => {
+                                                message.delete();
+                                            });
+                                        });
+                                    });
+                                    right.on("collect", () => {
+                                        messageEmbed.clearReactions().then(() => {
+                                            messageEmbed.react("◀").then(() => {
+                                                messageEmbed.react("❌").then(() => {
+                                                    messageEmbed.react("▶");
+                                                });
+                                            });
+                                        });
+                                        if (index === (graveYard.length - 1)) index = 0;
+                                        else index++;
+
+                                        var date = graveYard[index].death_date;
+                                        var className = graveYard[index].class;
+                                        var level = graveYard[index].level;
+                                        var fame = graveYard[index].total_fame;
+                                        var xp = graveYard[index].experience;
+                                        var stats = graveYard[index].death_stats;
+                                        var killedBy = graveYard[index].killed_by;
+
+                                        var Rembed = new Discord.RichEmbed()
+                                            .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
+                                            .setColor(0xDA3118)
+                                            .setThumbnail(getCharImage(className))
+                                            .addField("Class:", className + " (level " + level + ") - " + stats, true)
+                                            .addBlankField(true)
+                                            .addBlankField(true)
+                                            .addField("Fame:", numberWithSpaces(fame), true)
+                                            .addField("Exp:", numberWithSpaces(xp), true)
+                                            .addBlankField(true)
+                                            .addField("Killed by:", killedBy, true)
+                                            .addField("On:", date, true)
+                                            .addBlankField(true)
+                                            .setFooter("Page " + (index + 1) + "/" + graveYard.length);
+                                        messageEmbed.edit(Rembed);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                }).catch(err => {
+                    if (err) message.channel.send(":x: **Error:\n" + err.message + "**");
+                });
+            }
+        break;
     }
 };
 
 module.exports.help = {
     name: "realmeye",
     description: "Fetch information about a player on the RealmEye website",
-    usage: PREFIX + "realmeye <user/character/pets> <username>"
+    usage: PREFIX + "realmeye <user/characters/pets/graveyard> <username>"
 };

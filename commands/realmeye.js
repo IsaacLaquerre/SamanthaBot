@@ -106,7 +106,7 @@ module.exports.run = async (bot, message, args) => {
                     if (characters.length <= 0) return message.channel.send(":x: **This user has no characters**");
 
                     if (args[3]) {
-                        if (args[3] < characterCount && !isNaN(args[3])) {
+                        if (args[3] <= characterCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }
@@ -263,7 +263,7 @@ module.exports.run = async (bot, message, args) => {
                     if (pets.length <= 0) return message.channel.send(":x: **This user has no pets**");
 
                     if (args[3]) {
-                        if (args[3] < petCount && !isNaN(args[3])) {
+                        if (args[3] <= petCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }
@@ -404,7 +404,7 @@ module.exports.run = async (bot, message, args) => {
                 graveScrape(args[2].toLowerCase(), 5).then(graveYard => {
 
                     if (args[3]) {
-                        if (args[3] < graveYard.length && !isNaN(args[3])) {
+                        if (args[3] <= graveYard.length && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }

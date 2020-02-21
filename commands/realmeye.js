@@ -433,6 +433,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("Exp:", numberWithSpaces(xp), true)
                         .addBlankField(true)
                         .addField("Killed by:", killedBy, true)
+                        .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                     message.channel.send(embed).then(messageEmbed => {
@@ -476,6 +477,7 @@ module.exports.run = async (bot, message, args) => {
                                             .addField("Exp:", numberWithSpaces(xp), true)
                                             .addBlankField(true)
                                             .addField("Killed by:", killedBy, true)
+                                            .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                                             .addBlankField(true)
                                             .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                                         messageEmbed.edit(Lembed);
@@ -517,6 +519,7 @@ module.exports.run = async (bot, message, args) => {
                                             .addField("Exp:", numberWithSpaces(xp), true)
                                             .addBlankField(true)
                                             .addField("Killed by:", killedBy, true)
+                                            .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                                             .addBlankField(true)
                                             .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                                         messageEmbed.edit(Rembed);

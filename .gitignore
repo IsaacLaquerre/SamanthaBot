@@ -1,2 +1,2 @@
 # Prevent all botConfig.json files from being committed to the repo to protect bot token
-# *botConfig.json
+*botConfig.json

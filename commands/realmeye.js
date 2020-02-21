@@ -106,7 +106,7 @@ module.exports.run = async (bot, message, args) => {
                     if (characters.length <= 0) return message.channel.send(":x: **This user has no characters**");
 
                     if (args[3]) {
-                        if (args[3] < characterCount && !isNaN(args[3])) {
+                        if (args[3] <= characterCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }
@@ -263,7 +263,7 @@ module.exports.run = async (bot, message, args) => {
                     if (pets.length <= 0) return message.channel.send(":x: **This user has no pets**");
 
                     if (args[3]) {
-                        if (args[3] < petCount && !isNaN(args[3])) {
+                        if (args[3] <= petCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }
@@ -404,12 +404,14 @@ module.exports.run = async (bot, message, args) => {
                 graveScrape(args[2].toLowerCase(), 5).then(graveYard => {
 
                     if (args[3]) {
-                        if (args[3] < graveYard.length && !isNaN(args[3])) {
+                        if (args[3] <= graveYard.length && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
                         }
                         else var index = 0;
                     }else var index = 0;
+
+                    graveYard.reverse();
 
                     var date = graveYard[index].death_date;
                     var className = graveYard[index].class;
@@ -431,7 +433,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("Exp:", numberWithSpaces(xp), true)
                         .addBlankField(true)
                         .addField("Killed by:", killedBy, true)
-                        .addField("On:", date, true)
+                        .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                     message.channel.send(embed).then(messageEmbed => {
@@ -475,7 +477,7 @@ module.exports.run = async (bot, message, args) => {
                                             .addField("Exp:", numberWithSpaces(xp), true)
                                             .addBlankField(true)
                                             .addField("Killed by:", killedBy, true)
-                                            .addField("On:", date, true)
+                                            .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                                             .addBlankField(true)
                                             .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                                         messageEmbed.edit(Lembed);
@@ -517,7 +519,7 @@ module.exports.run = async (bot, message, args) => {
                                             .addField("Exp:", numberWithSpaces(xp), true)
                                             .addBlankField(true)
                                             .addField("Killed by:", killedBy, true)
-                                            .addField("On:", date, true)
+                                            .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                                             .addBlankField(true)
                                             .setFooter("Page " + (index + 1) + "/" + graveYard.length);
                                         messageEmbed.edit(Rembed);
@@ -527,7 +529,7 @@ module.exports.run = async (bot, message, args) => {
                         });
                     });
                 }).catch(err => {
-                    if (err) message.channel.send(":x: **Error:\n" + err.message + "**");
+                    if (err) message.channel.send(":x: **Couldn't fetch this user's Graveyard. It may be hidden or empty **" + eyeEmote);
                 });
             }
         break;

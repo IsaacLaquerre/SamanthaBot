@@ -10,7 +10,7 @@ var eyeEmote = "<:rotmgeye:680089603277062149>";
 
 bot.on("ready", () => {
     clear({ toStart: true });
-    bot.user.setActivity("Realm Of The Mad God", { type: "PLAYING" });
+    bot.user.setActivity(PREFIX + "help", { type: "PLAYING" });
     console.log("\n--------------------\n|Samantha Bot ready|\n--------------------");
 });
 

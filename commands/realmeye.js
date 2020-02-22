@@ -54,8 +54,8 @@ function rank2Star(rank) {
     else if (rank === 75) return "<:whitestar:680133960793325568>";
 }
 
-module.exports.run = async (bot, message, args) => {
-    switch(args[1].toLowerCase()) {
+module.exports.run = async(bot, message, args) => {
+    switch (args[1].toLowerCase()) {
         case "user":
         case "u":
             if (!args[2]) return message.channel.send(":x: **No username given**");
@@ -90,7 +90,7 @@ module.exports.run = async (bot, message, args) => {
                     message.channel.send(embed);
                 });
             }
-        break;
+            break;
         case "characters":
         case "char":
         case "c":
@@ -109,9 +109,8 @@ module.exports.run = async (bot, message, args) => {
                         if (args[3] <= characterCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
-                        }
-                        else var index = 0;
-                    }else var index = 0;
+                        } else var index = 0;
+                    } else var index = 0;
 
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
@@ -142,7 +141,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("DEX", characters[index].stats.dexterity, true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + characterCount);
-                    if (characterCount <= 1) return;
+                    if (characterCount <= 1) return message.channel.send(embed);
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {
@@ -249,7 +248,7 @@ module.exports.run = async (bot, message, args) => {
                     });
                 });
             }
-        break;
+            break;
         case "pets":
         case "p":
             if (!args[2]) return message.channel.send(":x: **No username given**");
@@ -267,9 +266,8 @@ module.exports.run = async (bot, message, args) => {
                         if (args[3] <= petCount && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
-                        }
-                        else var index = 0;
-                    }else var index = 0;
+                        } else var index = 0;
+                    } else var index = 0;
 
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
@@ -297,7 +295,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("⠀", padlock(body.pets[index].ability3), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + petCount);
-                    if (petCount <= 1) return;
+                    if (petCount <= 1) return message.channel.send(embed);
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {
@@ -398,7 +396,7 @@ module.exports.run = async (bot, message, args) => {
                     });
                 });
             }
-        break;
+            break;
         case "graveyard":
         case "gy":
             if (!args[2]) return message.channel.send(":x: **No username given**");
@@ -409,9 +407,8 @@ module.exports.run = async (bot, message, args) => {
                         if (args[3] <= graveYard.length && !isNaN(args[3])) {
                             var index = args[3];
                             index--;
-                        }
-                        else var index = 0;
-                    }else var index = 0;
+                        } else var index = 0;
+                    } else var index = 0;
 
                     graveYard.reverse();
 
@@ -438,7 +435,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + graveYard.length);
-                    if (graveYard.length <= 1) return;
+                    if (graveYard.length <= 1) return message.channel.send(embed);
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {
@@ -535,7 +532,7 @@ module.exports.run = async (bot, message, args) => {
                     if (err) message.channel.send(":x: **Couldn't fetch this user's Graveyard. It may be hidden or empty **" + eyeEmote);
                 });
             }
-        break;
+            break;
     }
 };
 
@@ -543,4 +540,4 @@ module.exports.help = {
     name: "realmeye",
     description: "Fetch information about a player on the RealmEye website",
     usage: PREFIX + "realmeye <user/characters/pets/graveyard> <username>"
-};
+}

@@ -142,6 +142,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("DEX", characters[index].stats.dexterity, true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + characterCount);
+                    if (characterCount <= 1) return;
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {
@@ -296,6 +297,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("⠀", padlock(body.pets[index].ability3), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + petCount);
+                    if (petCount <= 1) return;
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {
@@ -436,6 +438,7 @@ module.exports.run = async (bot, message, args) => {
                         .addField("Killed On:", date.replace(/T/g, ", ").replace(/Z/g, ""), true)
                         .addBlankField(true)
                         .setFooter("Page " + (index + 1) + "/" + graveYard.length);
+                    if (graveYard.length <= 1) return;
                     message.channel.send(embed).then(messageEmbed => {
                         messageEmbed.react("◀").then(() => {
                             messageEmbed.react("❌").then(() => {

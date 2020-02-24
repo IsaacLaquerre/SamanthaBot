@@ -12,6 +12,16 @@ bot.on("ready", () => {
     clear({ toStart: true });
     bot.user.setActivity(PREFIX + "help", { type: "PLAYING" });
     console.log("\n--------------------\n|Samantha Bot ready|\n--------------------");
+
+    bot.channels.get("681326743579000881").setName("👥 Members: " + (bot.guilds.get("649061285891276826").members.size - 2));
+});
+
+bot.on("guildMemberAdd", () => {
+    bot.channels.get("681326743579000881").setName("👥 Members: " + (bot.guilds.get("649061285891276826").members.size - 2));
+});
+
+bot.on("guildMemberRemove", () => {
+    bot.channels.get("681326743579000881").setName("👥 Members: " + (bot.guilds.get("649061285891276826").members.size - 2));
 });
 
 bot.commands = new Discord.Collection();
@@ -41,10 +51,10 @@ bot.on("message", (message) => {
 
     //switch(args[0].toLowerCase()) {
     //    default:
-            var commandFile = bot.commands.get(args[0]);
-            if (commandFile) {
-                commandFile.run(bot, message, args);
-            }
+    var commandFile = bot.commands.get(args[0]);
+    if (commandFile) {
+        commandFile.run(bot, message, args);
+    }
     //    break;
     //}
 });

@@ -792,10 +792,12 @@ module.exports.run = async(bot, message, args) => {
                                             var difficulty = [];
                                             var image = [];
                                             var otherImages = [];
+                                            var lootBag = [];
                                             $("#d > div > table > tbody > tr > td > img").each(function(i, elem) {
                                                 if (!$(this).attr("title")) return;
                                                 if ($(this).attr("title").includes("Difficulty:")) difficulty.push($(this).attr("title").replace("Difficulty: ", ""));
                                                 if ($(this).attr("title").includes("Portal")) image.push("https:" + $(this).attr("src").replace(/ /g, "%20"));
+                                                if ($(this).attr("title").includes("Assigned to ")) lootBag.push($(this).attr("title").replace("Assigned to ", ""));
                                                 otherImages.push($(this).attr("src"));
                                             });
 
@@ -831,20 +833,29 @@ module.exports.run = async(bot, message, args) => {
 
                                             if (difficulty[0] === 0) graves = "Not available";
 
-                                            var pageDesc = info[0] + "\n" + info[1];
+                                            var pageDesc = [];
+                                            for (var i = 0; i < info.length; i++) {
+                                                pageDesc.push(info[i]);
+                                                if (i > 2) return;
+                                            }
+
+                                            if (lootBag.length > 0) var lootBagEmote = "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0];
 
                                             var wikiEmbed = new Discord.RichEmbed()
                                                 .setTitle("**" + name + "**")
                                                 .setURL("https://www.realmeye.com" + firstResult)
                                                 .setColor(0xDA3118)
                                                 .setThumbnail(image[0])
-                                                .setDescription(pageDesc);
+                                                .setDescription(pageDesc.join("\n"));
                                                 if (graves.length > 0) {
                                                     wikiEmbed.addField("Difficulty:", graves)
                                                     wikiEmbed.setImage(map[0])
                                                 }
+                                                if (lootBag.length > 0) {
+                                                    wikiEmbed.addField("Loot Bag:", lootBagEmote)
+                                                }
                                             return message.channel.send(wikiEmbed).catch(err => {
-                                                message.channel.send(":x: **No element matched the query \"" + args.slice(2).join(" ") + "\"** " + eyeEmote + "\n" + err.message)
+                                                message.channel.send(":x: **No element matched the query \"" + args.slice(2).join(" ") + "\"** " + eyeEmote)
                                             });
                                         }
                                     }else {

@@ -1,11 +1,21 @@
 const Discord = require("discord.js");
 const fetch = require("node-fetch");
 const graveScrape = require("graveyard-scrape").scrapeGraveyard;
+const request = require("request");
+const cheerio = require("cheerio");
 const config = require("../config/botConfig.json");
 
 var PREFIX = config.prefix;
 var rotmgEmote = "<:rotmg:680087018524377187>";
 var eyeEmote = "<:rotmgeye:680089603277062149>";
+
+function cleanArray(array) {
+    for (var i = 0; i != array.length; i++) {
+        if (array[i] === "") array.slice(i, i + 1);
+        if (array[i].includes("\\n")) array[i].replace(/\n/g, "");
+    }
+    return array;
+}
 
 function numberWithSpaces(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -403,6 +413,8 @@ module.exports.run = async(bot, message, args) => {
             else {
                 graveScrape(args[2].toLowerCase(), 5).then(graveYard => {
 
+                    if (graveYard.length === 0) return message.channel.send(":x: **No user matched the query \"" + args[2] + "\"** " + eyeEmote);
+
                     if (args[3]) {
                         if (args[3] <= graveYard.length && !isNaN(args[3])) {
                             var index = args[3];
@@ -529,7 +541,139 @@ module.exports.run = async(bot, message, args) => {
                         });
                     });
                 }).catch(err => {
-                    if (err) message.channel.send(":x: **Couldn't fetch this user's Graveyard. It may be hidden or empty **" + eyeEmote);
+                    if (err) message.channel.send(":x: **Couldn't fetch this user's Graveyard. It may be hidden or empty **" + eyeEmote + "\n" + err.message);
+                });
+            }
+            break;
+        case "wiki":
+        case "w":
+            if (!args[2]) return message.channel.send(":x: **No query provided**");
+            else {
+                var url = config.API_ENDPOINT + args.slice(2).join("%20").toLowerCase();
+                request({
+                    url: url,
+                    headers: {
+                        "user-agent": config.USER_AGENT
+                    }
+                }, (err, res, body) => {
+                    if (!err && res.statusCode == 200) {
+                        var $ = cheerio.load(body);
+                        var firstResult = $(".container > div > div > div > div > p > a").attr("href");
+                        if (firstResult === undefined) return message.channel.send(":x: **No element matched the query \"" + args.slice(2).join(" ") + "\"** " + eyeEmote);
+                        url = "https://www.realmeye.com" + firstResult;
+                        request({
+                            url: url,
+                            headers: {
+                                "user-agent": config.USER_AGENT
+                            }
+                        }, (err, res, body) => {
+                            if (!err && res.statusCode === 200) {
+                                var $ = cheerio.load(body);
+                                var image = "https:" + $("#e > div > img").attr("src");
+                                if (image) image.replace(/ /g, "%20");
+                                if (image === "https:undefined") image = "https:" + $(".row > div > div > div > table > tbody > tr > td > img").attr("src").replace(/ /g, "%20");
+                                if (image === "https:undefined") image = "https://brandslogo.net/wp-content/themes/logolove/images/not-available.jpg";
+                                var name = $(".row > div > h1").text();
+
+                                var description = [];
+                                description.push($(".table-responsive > table > tbody").text());
+
+                                var info = description.join("\n").split("\n").filter(function(el) {
+                                    return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' && !el.includes("Equip") && !el.includes("+") && !el.includes("On Self") && !el.includes("Rate of Fire");
+                                });
+
+
+                                var pageDesc = info[0].split(".")[0];
+                                var tier = info[4];
+                                var shots = info[6];
+                                var damage = info[8];
+                                var speed = info[10];
+                                var range = info[14];
+                                var fameBonus = info[info.indexOf("Fame Bonus") + 1];
+                                var feedPower = info[info.indexOf("Feed Power") + 1];
+                                if (info.indexOf("Soulbound") > -1) {
+                                    var souldbound = "Yes";
+                                } else {
+                                    var souldbound = "No";
+                                }
+
+                                if (info[1] === "The Realm Eye says:") {
+
+                                    description = [];
+                                    $("h3").each(function(i, elem) {
+                                        $("#e > div").find("p").each(function(i, elem) {
+                                            description.push($(this).text());
+                                        });
+                                    });
+
+
+                                    var info = description.join("\n").split("\n").filter(function(el) {
+                                        return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
+                                    });
+
+                                    var info;
+
+                                    if (info.length > 0) {
+
+                                        for (var i = 0; i != info.length; i++) {
+                                            if (info[i].includes("Immune")) immune.push(info[i].replace(/Immune to/g, ""));
+                                        }
+
+                                        if (immune.length === 0) immune.push("Nothing");
+
+                                        var wikiEmbed = new Discord.RichEmbed()
+                                            .setTitle("**" + name + "**")
+                                            .setURL("https://www.realmeye.com" + firstResult)
+                                            .setColor(0xDA3118)
+                                            .setThumbnail(image)
+                                            .setDescription(pageDesc)
+                                            .addField("Base HP:", HP, true)
+                                            .addField("DEF:", def, true)
+                                            .addField("EXP;", xp, true)
+                                            .addField("Location:", location, true)
+                                            .addField("Immune to:", immune.join(",\n"), true)
+                                            .addBlankField(true);
+                                        return message.channel.send(wikiEmbed);
+                                    } else {
+                                        description = [];
+                                        $("#stats > p").each(function(i, elem) {
+                                            description.push($(this).text());
+                                        });
+
+
+                                        info = description.join("\n").split("\n").filter(function(el) {
+                                            return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
+                                        });
+                                    }
+                                }
+
+                                var pageDesc = $(".container > div").find("p").first().text();
+
+                                var HP = info[0].replace("Base HP: ", "");
+                                var def = info[1].replace("DEF: ", "");
+                                var xp = info[2].replace("EXP: ", "");
+                                var location = info[3].replace("Location: ", "");
+                                var immune = [];
+
+                                var wikiEmbed = new Discord.RichEmbed()
+                                    .setTitle("**" + name + "**")
+                                    .setURL("https://www.realmeye.com" + firstResult)
+                                    .setColor(0xDA3118)
+                                    .setThumbnail(image)
+                                    .setDescription(pageDesc)
+                                    .addField("Tier:", tier, true)
+                                    .addField("Shots:", shots, true)
+                                    .addField("Damage;", damage, true)
+                                    .addField("Speed:", speed, true)
+                                    .addField("Range:", range, true)
+                                    .addField("Fame Bonus:", fameBonus, true)
+                                    .addField("Feed Power:", feedPower, true)
+                                    .addField("Soulbound:", souldbound, true)
+                                    .addBlankField(true);
+                                message.channel.send(wikiEmbed);
+                            }
+                        });
+                    }
                 });
             }
             break;

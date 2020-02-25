@@ -83,6 +83,16 @@ module.exports.run = (bot, message, args) => {
                         .addField("Usage:", PREFIX + "realmeye graveyard <username>")
                     message.channel.send(embed);
                 break;
+                case "wiki":
+                case "w":
+                    var embed = new Discord.RichEmbed()
+                        .setTitle("**Samantha Bot Help - " + PREFIX + "realmeye wiki**")
+                        .setColor(0x000000)
+                        .setDescription("Legend: <required argument>, [optional argument]")
+                        .addField(PREFIX + "realmeye wiki", "Information on a about the provided item/boss/dungeon from the RealmEye Wiki")
+                        .addField("Usage:", PREFIX + "realmeye wiki <query>")
+                    message.channel.send(embed);
+                break;
                 default:
                 break;
             }

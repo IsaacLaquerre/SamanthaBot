@@ -1,4 +1,6 @@
 {
-  "prefix": "Change this to the prefered prefix",
-  "token": "Change this to your application's token"
+  "prefix": "s!",
+  "token": "NjgwMDY0MzI0OTYxOTYwMDYx.XlUr8w.8MTW32pb0Q0z2QuuvZjMivhUvlA",
+  "API_ENDPOINT": "https://www.realmeye.com/wiki-search?q=",
+  "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
 }

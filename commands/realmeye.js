@@ -9,6 +9,26 @@ var PREFIX = config.prefix;
 var rotmgEmote = "<:rotmg:680087018524377187>";
 var eyeEmote = "<:rotmgeye:680089603277062149>";
 
+function requestItems() {
+    return new Promise(function(resolve, reject) {
+        request({
+            url: "https://www.realmeye.com/s/dw/js/definition.js",
+            headers: {
+                "user-agent": config.USER_AGENT
+            }
+        }, (err, res, body) => {
+            if (!err && res.statusCode === 200) {
+                item = body.replace("items=", "").replace(/;/g, "").replace(/e3/g, "0000");
+                item = item.replace(/-?\d+:/g, function(n) {
+                    if (item[item.indexOf(n) - 1] === "\"") return n.replace(/:/g, "");
+                    return "\"" + n.replace(/:/g, "") + "\":";
+                });
+                resolve(JSON.parse(item));
+            } else reject(err);
+        });
+    });
+}
+
 function wiki(result, message, bot, args) {
     url = "https://www.realmeye.com" + result;
     request({
@@ -47,7 +67,7 @@ function wiki(result, message, bot, args) {
             if (info.indexOf("Soulbound") > -1) {
                 var soulbound = "Yes";
             } else {
-                var soulbound = "No";
+                soulbound = "No";
             }
 
             if (info.indexOf("Rate of Fire") > -1) var rateOfFire = info[info.indexOf("Rate of Fire") + 1];
@@ -58,7 +78,7 @@ function wiki(result, message, bot, args) {
             if (info.indexOf("Shots") < 0 && info.indexOf("Tier") > -1) {
 
                 var tdRaw = [];
-                var tier = [];
+                tier = [];
                 $(".table-responsive > table > tbody > tr").each(function(i, elem) {
                     if ($("th", elem).text() === "On Equip") tdRaw.push($("td", elem).text());
                     tier.push($("th", elem).text());
@@ -69,19 +89,19 @@ function wiki(result, message, bot, args) {
                     tier = tier[0].replace("Tier", "");
                 }
 
-                var pageDesc = info[0];
+                pageDesc = info[0];
                 var mpCost = info[info.indexOf("MP Cost") + 1];
                 var onEquip = tdRaw[0];
                 var effects = [];
                 var duration = info[info.indexOf("Duration") + 1];
-                var range = info[info.indexOf("Range") + 1];
+                range = info[info.indexOf("Range") + 1];
                 var cooldown = info[info.indexOf("Cooldown") + 1];
-                var fameBonus = info[info.indexOf("Fame Bonus") + 1];
-                var feedPower = info[info.indexOf("Feed Power") + 1];
+                fameBonus = info[info.indexOf("Fame Bonus") + 1];
+                feedPower = info[info.indexOf("Feed Power") + 1];
                 if (info.indexOf("Soulbound") > -1) {
-                    var soulbound = "Yes";
+                    soulbound = "Yes";
                 } else {
-                    var soulbound = "No";
+                    soulbound = "No";
                 }
 
                 if (tdRaw.length === 0) onEquip = "No effect";
@@ -110,35 +130,35 @@ function wiki(result, message, bot, args) {
                         .setColor(0xDA3118)
                         .setThumbnail(image)
                         .setDescription(pageDesc);
-                        if (tier.length != 0) wikiEmbed.addField("Tier:", tier, true);
-                        wikiEmbed.addField("MP Cost:", mpCost, true)
-                        wikiEmbed.addField("On Equip:", onEquip, true)
-                        wikiEmbed.addField("Effects:", effects.join(",\n"), true)
-                        wikiEmbed.addField("Duration:", duration, true)
-                        wikiEmbed.addField("Range:", range, true)
-                        wikiEmbed.addField("Cooldown:", cooldown, true)
-                        wikiEmbed.addField("Fame Bonus:", fameBonus, true)
-                        wikiEmbed.addField("Feed Power:", feedPower, true)
-                        wikiEmbed.addField("Soulbound:", soulbound, true)
-                        wikiEmbed.addField("Loot Bag:", lootBagEmote, true)
-                        if (tier.length === 0) wikiEmbed.addBlankField(true);
+                    if (tier.length != 0) wikiEmbed.addField("Tier:", tier, true);
+                    wikiEmbed.addField("MP Cost:", mpCost, true);
+                    wikiEmbed.addField("On Equip:", onEquip, true);
+                    wikiEmbed.addField("Effects:", effects.join(",\n"), true);
+                    wikiEmbed.addField("Duration:", duration, true);
+                    wikiEmbed.addField("Range:", range, true);
+                    wikiEmbed.addField("Cooldown:", cooldown, true);
+                    wikiEmbed.addField("Fame Bonus:", fameBonus, true);
+                    wikiEmbed.addField("Feed Power:", feedPower, true);
+                    wikiEmbed.addField("Soulbound:", soulbound, true);
+                    wikiEmbed.addField("Loot Bag:", lootBagEmote, true);
+                    if (tier.length === 0) wikiEmbed.addBlankField(true);
                     return message.channel.send(wikiEmbed).catch(err => {
                         message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
                     });
-                }else {
+                } else {
                     var wikiEmbed = new Discord.RichEmbed()
                         .setTitle("**" + name + "**")
                         .setURL("https://www.realmeye.com" + result)
                         .setColor(0xDA3118)
                         .setThumbnail(image)
-                        .setDescription(pageDesc)
-                        if (tier.length != 0) wikiEmbed.addField("Tier:", tier, true);
-                        wikiEmbed.addField("On Equip:", onEquip, true)
-                        wikiEmbed.addField("Feed Power:", feedPower, true)
-                        wikiEmbed.addField("Fame Bonus:", fameBonus, true)
-                        wikiEmbed.addField("Soulbound:", soulbound, true)
-                        wikiEmbed.addField("Loot Bag:", "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0], true)
-                        if (tier.length === 0) wikiEmbed.addBlankField(true);
+                        .setDescription(pageDesc);
+                    if (tier.length != 0) wikiEmbed.addField("Tier:", tier, true);
+                    wikiEmbed.addField("On Equip:", onEquip, true);
+                    wikiEmbed.addField("Feed Power:", feedPower, true);
+                    wikiEmbed.addField("Fame Bonus:", fameBonus, true);
+                    wikiEmbed.addField("Soulbound:", soulbound, true);
+                    wikiEmbed.addField("Loot Bag:", "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0], true)
+                    if (tier.length === 0) wikiEmbed.addBlankField(true);
                     return message.channel.send(wikiEmbed).catch(err => {
                         message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
                     });
@@ -153,9 +173,9 @@ function wiki(result, message, bot, args) {
                         description.push($(this).text());
                     });
 
-                    var pageDesc = $(".container > div").find("p").first().text();
+                    pageDesc = $(".container > div").find("p").first().text();
 
-                    var info = description.join("\n").split("\n").filter(function(el) {
+                    info = description.join("\n").split("\n").filter(function(el) {
                         return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
                     });
 
@@ -186,8 +206,8 @@ function wiki(result, message, bot, args) {
                             .addField("Immune to:", immune.join(",\n"), true)
                             .addBlankField(true);
                         return message.channel.send(wikiEmbed).catch(err => {
-                        message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
-                    });
+                            message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
+                        });
                     } else {
                         description = [];
                         $("#d > p").each(function(i, elem) {
@@ -198,7 +218,7 @@ function wiki(result, message, bot, args) {
                             return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
                         });
 
-                        var pageDesc = info[0];
+                        pageDesc = info[0];
                         var HP = info[0].replace("Base HP:", "").replace("HP:", "");
                         var def = info[1].replace("DEF:", "");
                         var xp = info[2].replace("EXP:", "");
@@ -225,31 +245,31 @@ function wiki(result, message, bot, args) {
                             .addField("Immune to:", immune.join(",\n"), true)
                             .addBlankField(true);
                         return message.channel.send(wikiEmbed).catch(err => {
-                        message.channel.send(":x: **Coudln't get information on query \"" + args.slice(2).join(" ") + "\"** " + eyeEmote)
-                    });
+                            message.channel.send(":x: **Coudln't get information on query \"" + args.slice(2).join(" ") + "\"** " + eyeEmote)
+                        });
                     }
-                }else if (info[0] === "The Realm Eye says:" && $("#stats").text() === "Stats") {
+                } else if (info[0] === "The Realm Eye says:" && $("#stats").text() === "Stats") {
 
                     description = [];
                     $("#d > div").find("p").each(function(i, elem) {
                         description.push($(this).text());
                     });
 
-                    var pageDesc = $(".container > div").find("p").first().text();
+                    pageDesc = $(".container > div").find("p").first().text();
 
-                    var info = description.join("\n").split("\n").filter(function(el) {
+                    info = description.join("\n").split("\n").filter(function(el) {
                         return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
                     });
 
                     if (info.length > 0) {
 
-                        var HP = info[1].replace("Base HP: ", "").replace("HP: ", "");
-                        var def = info[2].replace("DEF: ", "");
-                        var xp = info[3].replace("EXP: ", "");
-                        var location = info[4].replace("Location: ", "");
-                        var immune = [];
+                        HP = info[1].replace("Base HP: ", "").replace("HP: ", "");
+                        def = info[2].replace("DEF: ", "");
+                        xp = info[3].replace("EXP: ", "");
+                        location = info[4].replace("Location: ", "");
+                        immune = [];
 
-                        for (var i = 0; i != info.length; i++) {
+                        for (i = 0; i != info.length; i++) {
                             if (info[i].includes("Immune")) immune.push(info[i].replace(/Immune to/g, ""));
                         }
 
@@ -268,8 +288,8 @@ function wiki(result, message, bot, args) {
                             .addField("Immune to:", immune.join(",\n"), true)
                             .addBlankField(true);
                         return message.channel.send(wikiEmbed).catch(err => {
-                        message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
-                    });
+                            message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
+                        });
                     } else {
                         description = [];
                         $("#d > p").each(function(i, elem) {
@@ -280,14 +300,14 @@ function wiki(result, message, bot, args) {
                             return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.includes("Counts");
                         });
 
-                        var pageDesc = info[0];
+                        pageDesc = info[0];
                         var HP = info[1].replace("Base HP:", "").replace("HP:", "");
                         var def = info[2].replace("DEF:", "");
                         var xp = info[3].replace("EXP:", "");
                         var location = info[4].replace("Location:", "");
                         var immune = [];
 
-                        for (var i = 0; i != info.length; i++) {
+                        for (i = 0; i != info.length; i++) {
                             if (info[i].includes("Immune")) immune.push(info[i].replace(/Immune to/g, ""));
                         }
 
@@ -307,10 +327,10 @@ function wiki(result, message, bot, args) {
                             .addField("Immune to:", immune.join(",\n"), true)
                             .addBlankField(true);
                         return message.channel.send(wikiEmbed).catch(err => {
-                        message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
-                    });
+                            message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
+                        });
                     }
-                }else {
+                } else {
 
                     var map = [];
                     $("#d > p > img").each(function(i, elem) {
@@ -339,9 +359,9 @@ function wiki(result, message, bot, args) {
                     }
 
                     var difficulty = [];
-                    var image = [];
+                    image = [];
                     var otherImages = [];
-                    var lootBag = [];
+                    lootBag = [];
                     $("#d > div > table > tbody > tr > td > img").each(function(i, elem) {
                         if (!$(this).attr("title")) return;
                         if ($(this).attr("title").includes("Difficulty:")) difficulty.push($(this).attr("title").replace("Difficulty: ", ""));
@@ -365,9 +385,9 @@ function wiki(result, message, bot, args) {
                         return el.replace(/ /g, "") != '' && el != null && el != '' && el != ' ' & !el.toLowerCase().includes("key");
                     });
 
-                    if (!info.length === 0) {
+                    if (info.length != 0) {
                         description = [];
-                        var tier = [];
+                        tier = [];
                         $("#d > div > table > tbody > tr").each(function(i, elem) {
                             description.push($("td", this).text());
                         });
@@ -379,19 +399,19 @@ function wiki(result, message, bot, args) {
 
                     var graves = "";
 
-                    for (var i = 0; i != parseInt(difficulty[0]); i++) {
+                    for (i = 0; i != parseInt(difficulty[0]); i++) {
                         graves += "<:difficultyGrave:681914240013303818>";
                     }
 
                     if (difficulty[0] === 0) graves = "Not available";
 
-                    var pageDesc = [];
+                    pageDesc = [];
                     for (var i = 0; i < info.length; i++) {
                         pageDesc.push(info[i]);
                         if (i > 2) continue;
                     }
 
-                    if (lootBag.length > 0) var lootBagEmote = "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0];
+                    if (lootBag.length > 0) lootBagEmote = "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0];
 
                     var wikiEmbed = new Discord.RichEmbed()
                         .setTitle("**" + name + "**")
@@ -399,18 +419,18 @@ function wiki(result, message, bot, args) {
                         .setColor(0xDA3118)
                         .setThumbnail(image[0])
                         .setDescription(pageDesc.join("\n"));
-                        if (graves.length > 0) {
-                            wikiEmbed.addField("Difficulty:", graves)
-                            wikiEmbed.setImage(map[0])
-                        }
-                        if (lootBag.length > 0) {
-                            wikiEmbed.addField("Loot Bag:", lootBagEmote)
-                        }
+                    if (graves.length > 0) {
+                        wikiEmbed.addField("Difficulty:", graves)
+                        wikiEmbed.setImage(map[0])
+                    }
+                    if (lootBag.length > 0) {
+                        wikiEmbed.addField("Loot Bag:", lootBagEmote)
+                    }
                     return message.channel.send(wikiEmbed).catch(err => {
                         message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
                     });
                 }
-            }else {
+            } else {
 
                 var lootBag = [];
 
@@ -419,8 +439,8 @@ function wiki(result, message, bot, args) {
                     if ($(this).attr("alt").includes("Assigned to")) lootBag.push($(this).attr("alt").replace("Assigned to", ""));
                 });
 
-                if (lootBag.length === 0) var lootBagEmote = "No loot bag";
-                else var lootBagEmote = "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0];
+                if (lootBag.length === 0) lootBagEmote = "No loot bag";
+                else lootBagEmote = "<:" + lootBag[0].replace(/ /g, "").toLowerCase() + ":" + bot.emojis.find(emoji => emoji.name === lootBag[0].replace(/ /g, "").toLowerCase()).id + "> " + lootBag[0];
 
                 var wikiEmbed = new Discord.RichEmbed()
                     .setTitle("**" + name + "**")
@@ -440,8 +460,8 @@ function wiki(result, message, bot, args) {
                     .addField("Loot Bag:", lootBagEmote, true)
                     .addBlankField(true);
                 message.channel.send(wikiEmbed).catch(err => {
-                        message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
-                    });
+                    message.channel.send(":x: **Couldn't get information on this item. Feel free to visit the link yourself; https://www.realmeye.com" + result + "** " + eyeEmote)
+                });
             }
         }
     });
@@ -515,6 +535,7 @@ module.exports.run = async(bot, message, args) => {
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + " **RotMG Player Card - " + name + "**")
                         .setColor(0xDA3118)
+                        .setURL("https://www.realmeye.com/player/" + name)
                         .addField("Rank:", rank2Star(rank) + " " + rank, true)
                         .addField("Exp:", numberWithSpaces(xp), true)
                         .addBlankField(true)
@@ -555,6 +576,7 @@ module.exports.run = async(bot, message, args) => {
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
                         .setColor(0xDA3118)
+                        .setURL("https://www.realmeye.com/player/" + name)
                         .setThumbnail(getCharImage(characters[index].class.toLowerCase()))
                         .addField("Class:", characters[index].class + " (" + characters[index].level + ")", true)
                         .addField("Class quests:", characters[index].class_quests_completed, true)
@@ -606,6 +628,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Lembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/player/" + name)
                                             .setThumbnail(getCharImage(characters[index].class.toLowerCase()))
                                             .addField("Class:", characters[index].class + " (" + characters[index].level + ")", true)
                                             .addField("Class quests:", characters[index].class_quests_completed, true)
@@ -654,6 +677,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Rembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Characters)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/player/" + name)
                                             .setThumbnail(getCharImage(characters[index].class.toLowerCase()))
                                             .addField("Class:", characters[index].class + " (" + characters[index].level + ")", true)
                                             .addField("Class quests:", characters[index].class_quests_completed, true)
@@ -712,6 +736,7 @@ module.exports.run = async(bot, message, args) => {
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                         .setColor(0xDA3118)
+                        .setURL("https://www.realmeye.com/pets-of/" + name)
                         .addField("Name: ", body.pets[index].name, true)
                         .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
                         .addBlankField(true)
@@ -760,6 +785,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Lembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/pets-of/" + name)
                                             .addField("Name: ", body.pets[index].name, true)
                                             .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
                                             .addBlankField(true)
@@ -805,6 +831,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Rembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Pets)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/pets-of/" + name)
                                             .addField("Name: ", body.pets[index].name, true)
                                             .addField("Type: ", body.pets[index].rarity + " " + body.pets[index].family, true)
                                             .addBlankField(true)
@@ -866,6 +893,7 @@ module.exports.run = async(bot, message, args) => {
                     var embed = new Discord.RichEmbed()
                         .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
                         .setColor(0xDA3118)
+                        .setURL("https://www.realmeye.com/graveyard-of-player/" + name)
                         .setThumbnail(getCharImage(className))
                         .addField("Class:", className + " (level " + level + ") - " + stats, true)
                         .addBlankField(true)
@@ -911,6 +939,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Lembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/graveyard-of-player/" + name)
                                             .setThumbnail(getCharImage(className))
                                             .addField("Class:", className + " (level " + level + ") - " + stats, true)
                                             .addBlankField(true)
@@ -953,6 +982,7 @@ module.exports.run = async(bot, message, args) => {
                                         var Rembed = new Discord.RichEmbed()
                                             .setTitle(rotmgEmote + "** RotMG Player Card - " + name + " (Graveyard)**")
                                             .setColor(0xDA3118)
+                                            .setURL("https://www.realmeye.com/graveyard-of-player/" + name)
                                             .setThumbnail(getCharImage(className))
                                             .addField("Class:", className + " (level " + level + ") - " + stats, true)
                                             .addBlankField(true)
@@ -974,7 +1004,7 @@ module.exports.run = async(bot, message, args) => {
                     if (err) message.channel.send(":x: **Couldn't fetch this user's Graveyard. It may be hidden or empty **" + eyeEmote + "\n" + err.message);
                 });
             }
-        break;
+            break;
         case "wiki":
         case "w":
             if (!args[2]) return message.channel.send(":x: **No query provided**");
@@ -1042,30 +1072,55 @@ module.exports.run = async(bot, message, args) => {
                                                     one.on("collect", () => {
                                                         wiki(results[0], message, bot, args);
                                                         choiceEmbed.clearReactions().then(() => {
+                                                            one.stop();
+                                                            two.stop();
+                                                            three.stop();
+                                                            four.stop();
+                                                            five.stop();
                                                             choiceEmbed.delete();
                                                         });
                                                     });
                                                     two.on("collect", () => {
                                                         wiki(results[1], message, bot, args);
                                                         choiceEmbed.clearReactions().then(() => {
+                                                            one.stop();
+                                                            two.stop();
+                                                            three.stop();
+                                                            four.stop();
+                                                            five.stop();
                                                             choiceEmbed.delete();
                                                         });
                                                     });
                                                     three.on("collect", () => {
                                                         wiki(results[2], message, bot, args);
                                                         choiceEmbed.clearReactions().then(() => {
+                                                            one.stop();
+                                                            two.stop();
+                                                            three.stop();
+                                                            four.stop();
+                                                            five.stop();
                                                             choiceEmbed.delete();
                                                         });
                                                     });
                                                     four.on("collect", () => {
                                                         wiki(results[3], message, bot, args);
                                                         choiceEmbed.clearReactions().then(() => {
+                                                            one.stop();
+                                                            two.stop();
+                                                            three.stop();
+                                                            four.stop();
+                                                            five.stop();
                                                             choiceEmbed.delete();
                                                         });
                                                     });
                                                     five.on("collect", () => {
                                                         wiki(results[4], message, bot, args);
                                                         choiceEmbed.clearReactions().then(() => {
+                                                            one.stop();
+                                                            two.stop();
+                                                            three.stop();
+                                                            four.stop();
+                                                            five.stop();
                                                             choiceEmbed.delete();
                                                         });
                                                     });
@@ -1079,7 +1134,115 @@ module.exports.run = async(bot, message, args) => {
                     }
                 });
             }
-        break;
+            break;
+        case "trade":
+        case "trading":
+        case "t":
+            if (!args[2]) return message.channel.send(":x **No query provided**");
+            else {
+                if (!args[3]) return message.channel.send(":x **No query provided**");
+                else {
+                    if (args[2].toLowerCase() != "b" && args[2].toLowerCase() != "s" && args[2].toLowerCase() != "buy" && args[2].toLowerCase() != "sell") return message.channel.send(":x: **Invalid type provided. \"" + args[2] + "\" is not an action [buy/sell]** " + eyeEmote);
+                    if (args[2].toLowerCase() === "b") var action = "buy";
+                    else if (args[2].toLowerCase() === "s") action = "sell";
+                    else action = args[2].toLowerCase();
+                    var itemsList = [];
+                    await requestItems().then(res => { itemsList.push(res) });
+                    itemsList = itemsList[0];
+                    var url = "https://www.realmeye.com/current-offers";
+                    request({
+                        url: url,
+                        headers: {
+                            "user-agent": config.USER_AGENT
+                        }
+                    }, (err, res, body) => {
+                        if (!err && res.statusCode === 200) {
+                            var $ = cheerio.load(body);
+                            var items = [];
+                            var itemName = [];
+                            $(".current-offers > .item-wrapper").each(function(i, element) {
+                                if ($(element).attr("class").includes("disabled")) return;
+                                if ($("a > span", element).attr("class") === "item") {
+                                    if ($("a > span", element).attr("title").toLowerCase() === args.slice(3).join(" ").toLowerCase()) {
+                                        $("a", element).each(function(ind, elem) {
+                                            if (!$(this).attr("class")) return;
+                                            if ($(this).attr("class") === "item-" + action + "ing") {
+                                                items.push($(this).attr("href"));
+                                                itemName.push($(".item", elem).attr("title"));
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        } else return message.channel.send(":x: **Couldn't access RealmEye servers**");
+                        if (items.length === 0) return message.channel.send(":x: **No element matched the query \"" + args.slice(3).join(" ") + "\"** " + eyeEmote);
+                        url = "https://www.realmeye.com" + items[0];
+                        request({
+                            url: url,
+                            headers: {
+                                "user-agent": config.USER_AGENT
+                            }
+                        }, (err, res, body) => {
+                            if (!err && res.statusCode === 200) {
+                                var $ = cheerio.load(body);
+                                var tradeInfo = [];
+                                var tradesSell = [];
+                                var tradeSell = [];
+                                var tradesBuy = [];
+                                var tradeBuy = [];
+                                var tradesTime = [];
+                                var tradesAuthor = [];
+                                var tradesLink = [];
+                                var iiii = 0;
+                                var iii = 0;
+                                $("#g > tbody > tr").each(function(i, element) {
+                                    tradeInfo = [];
+                                    tradeSell = [];
+                                    tradeBuy = [];
+                                    $("td", element).each(function(ind, elem) {
+                                        iii = 0;
+                                        $(".item-static", elem).each(function(index, e) {
+                                            var tier = itemsList[$(".item", e).attr("data-item").toString()];
+                                            tier = tier.filter(e => e != undefined);
+                                            if (tier[1] === 10 || tier[1] === 0 || tier[1] === 26) {
+                                                tier[2] = "";
+                                            } else {
+                                                if (tier[2] === -1) tier[2] = " UT";
+                                                else tier[2] = " T" + tier[2];
+                                            }
+                                            if (iii === 0) tradeSell.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
+                                            else if (iii === 1) tradeBuy.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
+                                            tradesSell.push(tradeSell);
+                                            tradesBuy.push(tradeBuy);
+                                            iii++;
+                                        });
+                                        tradeInfo.push($(".timeago", elem).text());
+                                        if ($("abbr", elem)) tradeInfo.push($("abbr", elem).text());
+                                        else tradeInfo.push("Unknown");
+                                        if ($("a", elem).attr("href") != undefined) {
+                                            if ($("a", elem).attr("href").includes("/offers-by/")) {
+                                                tradeInfo.push($("a", elem).text());
+                                                tradeInfo.push("https://www.realmeye.com" + $("a", elem).attr("href"));
+                                            }
+                                        }
+                                    });
+                                    tradeInfo = tradeInfo.filter(e => e != "");
+                                    tradesTime.push(tradeInfo[0]);
+                                    tradesAuthor.push(tradeInfo[1]);
+                                    tradesLink.push(tradeInfo[2]);
+                                    if (iiii >= 5) return;
+                                    console.log(tradeInfo)
+                                    console.log(tradesSell.join("; ") + " for " + tradesBuy.join("; ") + ", posted " + tradesTime[iiii] + " by " + tradesAuthor[iiii] + " (" + tradesLink[iiii] + ")");
+                                    iiii++;
+                                });
+                            } else return message.channel.send(":x: **No element matched the query \"" + args.slice(3).join(" ") + "\"** " + eyeEmote);
+                        });
+                    });
+                }
+            }
+            break;
+        default:
+            break;
     }
 };
 

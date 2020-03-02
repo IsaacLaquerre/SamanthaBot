@@ -20,27 +20,32 @@ module.exports.run = (bot, message, args) => {
         if (isNaN(args[1])) {
             var command = bot.commands.get(args[1].toLowerCase())
             if (command) {
-                embed.addField(PREFIX + command.help.name, command.help.description);
+                embed.addField(PREFIX + command.help.name + " (aliases: " + command.help.aliases.split(";").join(", ") + ")", command.help.description);
                 embed.addField("Usage: ", command.help.usage);
-            }
-            else {
-                bot.commands.forEach(command => {
-                    embed.addField(PREFIX + command.help.name, command.help.description);
+            }else {
+                bot.commands.forEach(function(commandFile) {
+                    var aliases = commandFile.help.aliases.split(";");
+                    for (i in aliases) {
+                        if (aliases[i] === args[1].toLowerCase()) {
+                            embed.addField(PREFIX + commandFile.help.name + " (aliases: " + commandFile.help.aliases.split(";").join(", ") + ")", commandFile.help.description);
+                            embed.addField("Usage: ", commandFile.help.usage);
+                        }
+                    }
                 });
             }
         }else {
             bot.commands.forEach(command => {
-                embed.addField(PREFIX + command.help.name, command.help.description);
+                embed.addField(PREFIX + command.help.name + " (aliases: " + command.help.aliases.split(";").join(", ") + ")", command.help.description);
             });
         }
     }else {
         bot.commands.forEach(command => {
-            embed.addField(PREFIX + command.help.name, command.help.description);
+            embed.addField(PREFIX + command.help.name + " (aliases: " + command.help.aliases.split(";").join(", ") + ")", command.help.description);
         });
     }
     if (!args[2]) message.channel.send(embed);
     else {
-        if (args[1].toLowerCase() === "realmeye") {
+        if (args[1].toLowerCase() === "realmeye" || args[1].toLowerCase() === "re") {
             switch(args[2].toLowerCase()) {
                 case "user":
                 case "u":
@@ -50,6 +55,7 @@ module.exports.run = (bot, message, args) => {
                         .setDescription("Legend: <required argument>, [optional argument]")
                         .addField(PREFIX + "realmeye user", "Information on a player displayed in an embed")
                         .addField("Usage:", PREFIX + "realmeye user <username>")
+                        .addField("Aliases:", "user, u")
                     message.channel.send(embed);
                 break;
                 case "characters":
@@ -61,6 +67,7 @@ module.exports.run = (bot, message, args) => {
                         .setDescription("Legend: <required argument>, [optional argument]")
                         .addField(PREFIX + "realmeye characters", "Information on a player's alive characters displayed in an embed")
                         .addField("Usage:", PREFIX + "realmeye characters <username>")
+                        .addField("Aliases:", "characters, char, c")
                     message.channel.send(embed);
                 break;
                 case "pets":
@@ -71,6 +78,7 @@ module.exports.run = (bot, message, args) => {
                         .setDescription("Legend: <required argument>, [optional argument]")
                         .addField(PREFIX + "realmeye pets", "Information on a player's pets displayed in an embed")
                         .addField("Usage:", PREFIX + "realmeye pets <username>")
+                        .addField("Aliases:", "pets, p")
                     message.channel.send(embed);
                 break;
                 case "graveyard":
@@ -81,6 +89,7 @@ module.exports.run = (bot, message, args) => {
                         .setDescription("Legend: <required argument>, [optional argument]")
                         .addField(PREFIX + "realmeye graveyard", "Information on a player's last 5 graveyard entries displayed in an embed")
                         .addField("Usage:", PREFIX + "realmeye graveyard <username>")
+                        .addField("Aliases:", "graveyard, gy")
                     message.channel.send(embed);
                 break;
                 case "wiki":
@@ -91,6 +100,7 @@ module.exports.run = (bot, message, args) => {
                         .setDescription("Legend: <required argument>, [optional argument]")
                         .addField(PREFIX + "realmeye wiki", "Information on a about the provided item/boss/dungeon from the RealmEye Wiki")
                         .addField("Usage:", PREFIX + "realmeye wiki <query>")
+                        .addField("Aliases:", "wiki, w")
                     message.channel.send(embed);
                 break;
                 default:
@@ -102,6 +112,7 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
     name: "help",
+    aliases: "h;?",
     description: "List of commands",
     usage: PREFIX + "help [command]"
 }

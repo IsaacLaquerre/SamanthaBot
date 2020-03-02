@@ -9,6 +9,8 @@ var PREFIX = config.prefix;
 var rotmgEmote = "<:rotmg:680087018524377187>";
 var eyeEmote = "<:rotmgeye:680089603277062149>";
 
+
+
 function requestItems() {
     return new Promise(function(resolve, reject) {
         request({
@@ -1163,7 +1165,7 @@ module.exports.run = async(bot, message, args) => {
                             $(".current-offers > .item-wrapper").each(function(i, element) {
                                 if ($(element).attr("class").includes("disabled")) return;
                                 if ($("a > span", element).attr("class") === "item") {
-                                    if ($("a > span", element).attr("title").toLowerCase() === args.slice(3).join(" ").toLowerCase()) {
+                                    if ($("a > span", element).attr("title").toLowerCase().includes(args.slice(3).join(" ").toLowerCase())) {
                                         $("a", element).each(function(ind, elem) {
                                             if (!$(this).attr("class")) return;
                                             if ($(this).attr("class") === "item-" + action + "ing") {
@@ -1187,20 +1189,22 @@ module.exports.run = async(bot, message, args) => {
                                 var $ = cheerio.load(body);
                                 var tradeInfo = [];
                                 var tradesSell = [];
-                                var tradeSell = [];
                                 var tradesBuy = [];
-                                var tradeBuy = [];
                                 var tradesTime = [];
                                 var tradesAuthor = [];
                                 var tradesLink = [];
                                 var iiii = 0;
                                 var iii = 0;
+                                var tradesEmbed = new Discord.RichEmbed();
+                                tradesEmbed.addField("⠀", "Selling", true)
+                                tradesEmbed.addField("⠀", "⠀", true)
+                                tradesEmbed.addField("⠀", "Buying", true)
                                 $("#g > tbody > tr").each(function(i, element) {
                                     tradeInfo = [];
-                                    tradeSell = [];
-                                    tradeBuy = [];
+                                    tradesSell = [];
+                                    tradesBuy = [];
+                                    iii = 0;
                                     $("td", element).each(function(ind, elem) {
-                                        iii = 0;
                                         $(".item-static", elem).each(function(index, e) {
                                             var tier = itemsList[$(".item", e).attr("data-item").toString()];
                                             tier = tier.filter(e => e != undefined);
@@ -1210,31 +1214,34 @@ module.exports.run = async(bot, message, args) => {
                                                 if (tier[2] === -1) tier[2] = " UT";
                                                 else tier[2] = " T" + tier[2];
                                             }
-                                            if (iii === 0) tradeSell.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
-                                            else if (iii === 1) tradeBuy.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
-                                            tradesSell.push(tradeSell);
-                                            tradesBuy.push(tradeBuy);
-                                            iii++;
+                                            if (iii === 0) {
+                                                tradesSell.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
+                                            }
+                                            else if (iii === 1) {
+                                                tradesBuy.push($(".item-quantity-static", e).text().slice(1) + "x " + itemsList[$("span", e).attr("data-item").toString()][0] + tier[2]);
+                                            }
                                         });
-                                        tradeInfo.push($(".timeago", elem).text());
-                                        if ($("abbr", elem)) tradeInfo.push($("abbr", elem).text());
-                                        else tradeInfo.push("Unknown");
                                         if ($("a", elem).attr("href") != undefined) {
                                             if ($("a", elem).attr("href").includes("/offers-by/")) {
                                                 tradeInfo.push($("a", elem).text());
                                                 tradeInfo.push("https://www.realmeye.com" + $("a", elem).attr("href"));
                                             }
                                         }
+                                        iii++;
                                     });
-                                    tradeInfo = tradeInfo.filter(e => e != "");
-                                    tradesTime.push(tradeInfo[0]);
-                                    tradesAuthor.push(tradeInfo[1]);
-                                    tradesLink.push(tradeInfo[2]);
+                                    tradesAuthor.push(tradeInfo[0]);
+                                    tradesLink.push(tradeInfo[1]);
                                     if (iiii >= 5) return;
-                                    console.log(tradeInfo)
-                                    console.log(tradesSell.join("; ") + " for " + tradesBuy.join("; ") + ", posted " + tradesTime[iiii] + " by " + tradesAuthor[iiii] + " (" + tradesLink[iiii] + ")");
+                                        tradesEmbed.setTitle(rotmgEmote + " **Results for \"" + args.slice(3).join(" ") + "\" (" + action + "ing)**")
+                                        tradesEmbed.setURL(url)
+                                        tradesEmbed.setThumbnail()
+                                        tradesEmbed.setColor(0xDA3118)
+                                        tradesEmbed.addField("⠀", "[" + tradesSell.join(" and ") + "](" + tradesLink[iiii] + ")", true)
+                                        tradesEmbed.addField("⠀", "[for](" + tradesLink[iiii] + ")", true)
+                                        tradesEmbed.addField("⠀", "[" + tradesBuy.join(" and ") + "](" + tradesLink[iiii] + ")", true)
                                     iiii++;
                                 });
+                                message.channel.send(tradesEmbed);
                             } else return message.channel.send(":x: **No element matched the query \"" + args.slice(3).join(" ") + "\"** " + eyeEmote);
                         });
                     });
@@ -1248,6 +1255,7 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "realmeye",
+    aliases: "re",
     description: "Fetch information about a player on the RealmEye website",
     usage: PREFIX + "realmeye <user/characters/pets/graveyard> <username>, " + PREFIX + "realmeye <wiki> <query>"
 }

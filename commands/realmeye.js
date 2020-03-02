@@ -19,14 +19,16 @@ function requestItems() {
                 "user-agent": config.USER_AGENT
             }
         }, (err, res, body) => {
-            if (!err && res.statusCode === 200) {
-                item = body.replace("items=", "").replace(/;/g, "").replace(/e3/g, "0000");
-                item = item.replace(/-?\d+:/g, function(n) {
-                    if (item[item.indexOf(n) - 1] === "\"") return n.replace(/:/g, "");
-                    return "\"" + n.replace(/:/g, "") + "\":";
-                });
-                resolve(JSON.parse(item));
-            } else reject(err);
+            if (!err) {
+                if (res.statusCode === 200) {
+                    item = body.replace("items=", "").replace(/;/g, "").replace(/e3/g, "0000");
+                    item = item.replace(/-?\d+:/g, function(n) {
+                        if (item[item.indexOf(n) - 1] === "\"") return n.replace(/:/g, "");
+                        return "\"" + n.replace(/:/g, "") + "\":";
+                    });
+                    resolve(JSON.parse(item));
+                }else reject("Error: " + res.statusCode);
+            }else reject(err);
         });
     });
 }
